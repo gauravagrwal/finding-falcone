@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
@@ -7,7 +8,50 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 
+type PlanetResponse = {
+  name: string;
+  distance: number;
+};
+
+type VehicleResponse = {
+  name: string;
+  total_no: number;
+  max_distance: number;
+  speed: number;
+};
+
 export default function HomeScreen() {
+  const [isLoading, setLoading] = useState(true);
+  const [planetsData, setPlanetsData] = useState<PlanetResponse[]>([]);
+  const [vehiclesData, setVehiclesData] = useState<VehicleResponse[]>([]);
+
+  const getPlanets = async () => {
+    try {
+      const response = await fetch('https://findfalcone.geektrust.com/planets');
+      const json = await response.json() as PlanetResponse[];
+      setPlanetsData(json);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getVehicles = async () => {
+    try {
+      const response = await fetch('https://findfalcone.geektrust.com/vehicles');
+      const json = await response.json() as VehicleResponse[];
+      setVehiclesData(json);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    getPlanets();
+    getVehicles();
+    setLoading(false);
+  }, [])
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
